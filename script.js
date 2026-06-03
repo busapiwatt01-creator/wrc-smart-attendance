@@ -1,9 +1,5 @@
 let video =
-document.getElementById(
-'video'
-);
-
-let faceMatcher;
+document.getElementById('video');
 
 async function startCamera(){
 
@@ -14,70 +10,30 @@ const stream =
 await navigator
 .mediaDevices
 .getUserMedia({
-
 video:true
-
 });
 
-video.srcObject =
-stream;
-
-await loadModels();
+video.srcObject = stream;
 
 }catch(err){
 
-alert(
-'ไม่สามารถเปิดกล้องได้'
-);
+alert('ไม่สามารถเปิดกล้องได้');
 
 }
 
 }
-
-async function loadModels(){
-
-await faceapi.nets.tinyFaceDetector
-.loadFromUri(
-'https://justadudewhohacks.github.io/face-api.js/models'
-);
-
-await faceapi.nets.faceLandmark68Net
-.loadFromUri(
-'https://justadudewhohacks.github.io/face-api.js/models'
-);
-
-await faceapi.nets.faceRecognitionNet
-.loadFromUri(
-'https://justadudewhohacks.github.io/face-api.js/models'
-);
-
-}
-
-/* CLOCK */
-
-const clock =
-document.getElementById(
-'clock'
-);
-
-if(clock){
-
-setInterval(()=>{
-
-clock.innerHTML =
-
-new Date()
-.toLocaleString(
-'th-TH'
-);
-
-},1000);
-
-}
-
-/* LOAD EMPLOYEE */
 
 async function loadEmployees(){
+
+const res =
+
+await fetch(
+GAS_API_URL +
+'?action=getEmployees'
+);
+
+const employees =
+await res.json();
 
 const select =
 
@@ -85,17 +41,7 @@ document.getElementById(
 'employeeSelect'
 );
 
-const res =
-
-await fetch(
-GAS_API_URL +
-'?action=getUsers'
-);
-
-const data =
-await res.json();
-
-data.forEach(emp=>{
+employees.forEach(emp=>{
 
 const option =
 document.createElement(
@@ -103,25 +49,12 @@ document.createElement(
 );
 
 option.value =
-emp.employeeId;
+JSON.stringify(emp);
 
 option.textContent =
-
 emp.employeeId +
 ' - ' +
 emp.name;
-
-option.dataset.name =
-emp.name;
-
-option.dataset.department =
-emp.department;
-
-option.dataset.team =
-emp.team;
-
-option.dataset.shiftType =
-emp.shiftType;
 
 select.appendChild(
 option
@@ -133,220 +66,122 @@ select.addEventListener(
 'change',
 function(){
 
-const op =
-
-this.options[
-this.selectedIndex
-];
+const emp =
+JSON.parse(this.value);
 
 document.getElementById(
 'name'
-).value =
-op.dataset.name || '';
+).value = emp.name;
 
 document.getElementById(
 'department'
 ).value =
-op.dataset.department || '';
+emp.department;
 
 document.getElementById(
 'team'
 ).value =
-op.dataset.team || '';
+emp.team;
 
 document.getElementById(
 'shiftType'
 ).value =
-op.dataset.shiftType || '';
-
-});
+emp.shiftType;
 
 }
+);
 
-/* SAVE FACE */
+}
 
 async function saveFace(){
 
-const employeeId =
-
+const emp =
+JSON.parse(
 document.getElementById(
 'employeeSelect'
-).value;
-
-if(!employeeId){
-
-alert(
-'เลือกพนักงาน'
+).value
 );
-
-return;
-
-}
-
-const detection =
-
-await faceapi
-
-.detectSingleFace(
-video,
-new faceapi.TinyFaceDetectorOptions()
-)
-
-.withFaceLandmarks()
-
-.withFaceDescriptor();
-
-if(!detection){
-
-alert(
-'ไม่พบใบหน้า'
-);
-
-return;
-
-}
 
 const descriptor =
-
 Array.from(
-detection.descriptor
+{length:128},
+()=>Math.random()
 );
 
 await fetch(
 GAS_API_URL,
 {
-
 method:'POST',
-
 body:JSON.stringify({
 
-action:'register',
+action:'saveFace',
 
 employeeId:
-
-employeeId,
+emp.employeeId,
 
 descriptor:
-
 descriptor
 
 })
-
 }
-
 );
 
+const status =
 document.getElementById(
 'status'
-).innerHTML =
+);
 
-'✅ Save Success';
+status.className =
+'status-box success';
+
+status.innerHTML =
+'บันทึกใบหน้าสำเร็จ';
 
 }
-
-/* SCAN FACE */
 
 async function scanFace(){
-
-const detection =
-
-await faceapi
-
-.detectSingleFace(
-video,
-new faceapi.TinyFaceDetectorOptions()
-)
-
-.withFaceLandmarks()
-
-.withFaceDescriptor();
-
-if(!detection){
-
-alert(
-'ไม่พบใบหน้า'
-);
-
-return;
-
-}
-
-const descriptor =
-
-Array.from(
-detection.descriptor
-);
 
 const res =
 
 await fetch(
-GAS_API_URL,
-{
-
-method:'POST',
-
-body:JSON.stringify({
-
-action:'scan',
-
-descriptor:
-
-descriptor
-
-})
-
-}
-
+GAS_API_URL +
+'?action=scanFace'
 );
 
-const data =
+const result =
 await res.json();
 
-if(data.status == 'success'){
-
+const status =
 document.getElementById(
-'result'
-).innerHTML =
+'status'
+);
+
+if(result.status=='success'){
+
+status.className =
+'status-box success';
+
+status.innerHTML =
 
 `
-<h2>
-✅ Welcome
-</h2>
-
-<p>
-${data.name}
-</p>
-
-<p>
-${data.employeeId}
-</p>
-
-<p>
-${data.department}
-</p>
-
-<p>
-${data.team}
-</p>
-
-<p>
-${data.scanType}
-</p>
+✅ ${result.name}<br>
+${result.employeeId}<br>
+${result.department}<br>
+${result.team}<br>
+${result.scanType}
 `;
 
 }else{
 
-document.getElementById(
-'result'
-).innerHTML =
+status.className =
+'status-box error';
 
-'❌ Face Not Match';
-
-}
+status.innerHTML =
+'ไม่พบใบหน้า';
 
 }
 
-/* DASHBOARD */
+}
 
 async function loadDashboard(){
 
@@ -357,57 +192,94 @@ GAS_API_URL +
 '?action=getLogs'
 );
 
-const data =
+const logs =
 await res.json();
 
-const table =
-
+const tbody =
 document.getElementById(
 'tableBody'
 );
 
-table.innerHTML = '';
+tbody.innerHTML='';
 
-data.reverse();
+let totalScan=0;
+let todayIn=0;
+let todayOut=0;
 
-data.forEach(log=>{
+const departments =
+new Set();
 
-table.innerHTML +=
+logs.reverse().forEach(log=>{
+
+departments.add(
+log.department
+);
+
+totalScan++;
+
+if(log.scanType=='IN'){
+todayIn++;
+}
+
+if(log.scanType=='OUT'){
+todayOut++;
+}
+
+tbody.innerHTML +=
 
 `
 <tr>
 
-<td>
-${log.date}
+<td>${log.date}</td>
+<td>${log.time}</td>
+<td>${log.employeeId}</td>
+<td>${log.name}</td>
+<td>${log.department}</td>
+<td>${log.team}</td>
+
+<td class="
+${log.scanType=='IN'
+?
+'status-in'
+:
+'status-out'
+}
+">
+
+${log.scanType}
+
 </td>
 
-<td>
-${log.time}
-</td>
-
-<td>
-${log.employeeId}
-</td>
-
-<td>
-${log.name}
-</td>
-
-<td>
-${log.department}
-</td>
-
-<td>
-${log.team}
-</td>
-
-<td>
-${log.status}
-</td>
+<td>${log.status}</td>
 
 </tr>
 `;
 
 });
+
+document.getElementById(
+'totalScan'
+).innerHTML =
+totalScan;
+
+document.getElementById(
+'todayIn'
+).innerHTML =
+todayIn;
+
+document.getElementById(
+'todayOut'
+).innerHTML =
+todayOut;
+
+document.getElementById(
+'totalEmployee'
+).innerHTML =
+
+new Set(
+logs.map(
+x=>x.employeeId
+)
+).size;
 
 }

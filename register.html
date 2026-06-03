@@ -19,23 +19,11 @@ rel="stylesheet"
 href="style.css"
 >
 
-<link
-href="https://fonts.googleapis.com/css2?family=Kanit:wght@300;400;500;600;700&display=swap"
-rel="stylesheet"
->
-
-<script
-defer
-src="https://cdn.jsdelivr.net/npm/face-api.js"
-></script>
-
 </head>
 
 <body>
 
 <div class="page">
-
-<div class="page-header">
 
 <a
 href="index.html"
@@ -46,19 +34,17 @@ class="back-btn"
 
 </a>
 
-<h1>
+<div class="form-card">
+
+<div class="page-title">
 👤 Register Face
-</h1>
-
 </div>
-
-<div class="card">
 
 <video
 id="video"
 autoplay
-muted
 playsinline
+muted
 ></video>
 
 <select id="employeeSelect">
@@ -93,7 +79,7 @@ readonly
 <input
 type="text"
 id="shiftType"
-placeholder="Shift Type"
+placeholder="ShiftType"
 readonly
 >
 
@@ -103,9 +89,12 @@ readonly
 
 </button>
 
-<div id="status">
+<div
+id="status"
+class="status-box"
+>
 
-✅ AI Ready
+AI Ready
 
 </div>
 
@@ -119,7 +108,6 @@ readonly
 <script>
 
 loadEmployees();
-
 startCamera();
 
 </script>

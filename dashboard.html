@@ -19,18 +19,11 @@ rel="stylesheet"
 href="style.css"
 >
 
-<link
-href="https://fonts.googleapis.com/css2?family=Kanit:wght@300;400;500;600;700&display=swap"
-rel="stylesheet"
->
-
 </head>
 
 <body>
 
 <div class="page">
-
-<div class="page-header">
 
 <a
 href="index.html"
@@ -41,9 +34,80 @@ class="back-btn"
 
 </a>
 
-<h1>
+<div class="page-title">
 📊 Attendance Dashboard
-</h1>
+</div>
+
+<div class="summary-grid">
+
+<div class="summary-card">
+
+<h3 id="totalEmployee">
+0
+</h3>
+
+<p>
+Employees
+</p>
+
+</div>
+
+<div class="summary-card">
+
+<h3 id="totalScan">
+0
+</h3>
+
+<p>
+Total Scan
+</p>
+
+</div>
+
+<div class="summary-card">
+
+<h3 id="todayIn">
+0
+</h3>
+
+<p>
+IN
+</p>
+
+</div>
+
+<div class="summary-card">
+
+<h3 id="todayOut">
+0
+</h3>
+
+<p>
+OUT
+</p>
+
+</div>
+
+</div>
+
+<div class="filter-box">
+
+<input
+type="date"
+id="filterDate"
+>
+
+<select id="filterDepartment">
+
+<option value="">
+All Department
+</option>
+
+</select>
+
+<button onclick="loadDashboard()">
+Refresh
+</button>
 
 </div>
 
@@ -61,6 +125,7 @@ class="back-btn"
 <th>Name</th>
 <th>Department</th>
 <th>Team</th>
+<th>Type</th>
 <th>Status</th>
 
 </tr>
