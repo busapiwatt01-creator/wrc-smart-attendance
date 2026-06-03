@@ -1,0 +1,215 @@
+<!DOCTYPE html>
+<html lang="th">
+
+<head>
+
+<meta charset="UTF-8">
+
+<meta
+name="viewport"
+content="width=device-width,initial-scale=1.0">
+
+<title>
+Scan Attendance
+</title>
+
+<link
+href="https://fonts.googleapis.com/css2?family=Sarabun:wght@300;400;700&display=swap"
+rel="stylesheet">
+
+<link
+rel="stylesheet"
+href="style.css">
+
+<script src="api-config.js"></script>
+
+<script defer
+src="https://cdn.jsdelivr.net/npm/face-api.js@0.22.2/dist/face-api.min.js">
+</script>
+
+</head>
+
+<body>
+
+<div class="container">
+
+<div class="card">
+
+<div class="title">
+📷 Scan Attendance
+</div>
+
+<div class="subtitle">
+สแกนใบหน้าเข้างาน
+</div>
+
+<video
+id="video"
+autoplay
+muted
+playsinline>
+</video>
+
+<button onclick="scanFace()">
+🚀 Scan Face
+</button>
+
+<div
+class="status"
+id="status">
+
+⏳ Loading AI...
+
+</div>
+
+</div>
+
+</div>
+
+<script src="script.js"></script>
+
+<script>
+
+const MODEL =
+MODEL_URL;
+
+async function loadAI(){
+
+await Promise.all([
+
+faceapi.nets.tinyFaceDetector
+.loadFromUri(MODEL),
+
+faceapi.nets.faceLandmark68Net
+.loadFromUri(MODEL),
+
+faceapi.nets.faceRecognitionNet
+.loadFromUri(MODEL)
+
+]);
+
+document.getElementById(
+'status'
+).innerHTML =
+'✅ AI Ready';
+
+}
+
+/* ======================= */
+
+async function scanFace(){
+
+const statusDiv =
+document.getElementById(
+'status'
+);
+
+statusDiv.innerHTML =
+'⏳ Scanning...';
+
+const detection =
+
+await faceapi
+.detectSingleFace(
+
+video,
+
+new faceapi
+.TinyFaceDetectorOptions()
+
+)
+.withFaceLandmarks()
+.withFaceDescriptor();
+
+if(!detection){
+
+statusDiv.innerHTML =
+
+'<span class="error">❌ ไม่พบใบหน้า</span>';
+
+return;
+
+}
+
+const descriptor =
+
+Array.from(
+detection.descriptor
+);
+
+/* API */
+
+const res =
+
+await fetch(
+
+GAS_API_URL,
+
+{
+
+method:'POST',
+
+body:JSON.stringify({
+
+action:'scan',
+
+descriptor:descriptor
+
+})
+
+}
+
+);
+
+const data =
+await res.json();
+
+/* RESULT */
+
+if(data.status == 'success'){
+
+statusDiv.innerHTML =
+
+`
+<div class="success">
+
+✅ Welcome<br><br>
+
+${data.name}<br>
+
+${data.employeeId}<br>
+
+${data.department}<br>
+
+${data.team}<br><br>
+
+${data.scanType}
+
+</div>
+`;
+
+}
+else{
+
+statusDiv.innerHTML =
+
+'<span class="error">❌ Face Not Match</span>';
+
+}
+
+}
+
+/* ======================= */
+
+(async()=>{
+
+await startCamera();
+
+await loadAI();
+
+})();
+
+</script>
+
+</body>
+</html>

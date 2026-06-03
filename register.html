@@ -1,0 +1,247 @@
+<!DOCTYPE html>
+<html lang="th">
+
+<head>
+
+<meta charset="UTF-8">
+
+<meta
+name="viewport"
+content="width=device-width,initial-scale=1.0">
+
+<title>
+Register Face
+</title>
+
+<link
+href="https://fonts.googleapis.com/css2?family=Sarabun:wght@300;400;700&display=swap"
+rel="stylesheet">
+
+<link
+rel="stylesheet"
+href="style.css">
+
+<script src="api-config.js"></script>
+
+<script defer
+src="https://cdn.jsdelivr.net/npm/face-api.js@0.22.2/dist/face-api.min.js">
+</script>
+
+</head>
+
+<body>
+
+<div class="container">
+
+<div class="card">
+
+<div class="title">
+👤 Register Face
+</div>
+
+<div class="subtitle">
+ลงทะเบียนใบหน้าพนักงาน
+</div>
+
+<video
+id="video"
+autoplay
+muted
+playsinline>
+</video>
+
+<input
+type="text"
+id="employeeId"
+placeholder="Employee ID">
+
+<input
+type="text"
+id="name"
+placeholder="Name">
+
+<input
+type="text"
+id="department"
+placeholder="Department">
+
+<input
+type="text"
+id="team"
+placeholder="Team">
+
+<input
+type="text"
+id="shiftType"
+placeholder="Shift Type">
+
+<button onclick="saveFace()">
+📸 Save Face
+</button>
+
+<div
+class="status"
+id="status">
+
+⏳ Loading AI...
+
+</div>
+
+</div>
+
+</div>
+
+<script src="script.js"></script>
+
+<script>
+
+const MODEL =
+MODEL_URL;
+
+async function loadAI(){
+
+await Promise.all([
+
+faceapi.nets.tinyFaceDetector
+.loadFromUri(MODEL),
+
+faceapi.nets.faceLandmark68Net
+.loadFromUri(MODEL),
+
+faceapi.nets.faceRecognitionNet
+.loadFromUri(MODEL)
+
+]);
+
+document.getElementById(
+'status'
+).innerHTML =
+'✅ AI Ready';
+
+}
+
+/* ======================= */
+
+async function saveFace(){
+
+const employeeId =
+document.getElementById(
+'employeeId'
+);
+
+const name =
+document.getElementById(
+'name'
+);
+
+if(
+!employeeId.value ||
+!name.value
+){
+
+alert(
+'กรอกข้อมูลให้ครบ'
+);
+
+return;
+
+}
+
+document.getElementById(
+'status'
+).innerHTML =
+'⏳ Detecting Face...';
+
+const detection =
+
+await faceapi
+.detectSingleFace(
+
+video,
+
+new faceapi
+.TinyFaceDetectorOptions()
+
+)
+.withFaceLandmarks()
+.withFaceDescriptor();
+
+if(!detection){
+
+document.getElementById(
+'status'
+).innerHTML =
+
+'<span class="error">❌ ไม่พบใบหน้า</span>';
+
+return;
+
+}
+
+const descriptor =
+
+Array.from(
+detection.descriptor
+);
+
+await fetch(
+
+GAS_API_URL,
+
+{
+
+method:'POST',
+
+body:JSON.stringify({
+
+action:'register',
+
+employeeId:
+employeeId.value,
+
+name:
+name.value,
+
+department:
+document.getElementById(
+'department'
+).value,
+
+team:
+document.getElementById(
+'team'
+).value,
+
+shiftType:
+document.getElementById(
+'shiftType'
+).value,
+
+descriptor:descriptor
+
+})
+
+});
+
+document.getElementById(
+'status'
+).innerHTML =
+
+'<span class="success">✅ Register Success</span>';
+
+}
+
+/* ======================= */
+
+(async()=>{
+
+await startCamera();
+
+await loadAI();
+
+})();
+
+</script>
+
+</body>
+</html>
