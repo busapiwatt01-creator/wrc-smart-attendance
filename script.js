@@ -3,47 +3,83 @@ let employeeData = [];
 
 async function loadModels(){
 
-await faceapi.nets.ssdMobilenetv1.loadFromUri(
-'https://cdn.jsdelivr.net/npm/face-api.js/weights'
-);
+const MODEL_URL =
+'https://cdn.jsdelivr.net/npm/@vladmandic/face-api/model/';
 
-await faceapi.nets.faceRecognitionNet.loadFromUri(
-'https://cdn.jsdelivr.net/npm/face-api.js/weights'
-);
+await Promise.all([
 
-await faceapi.nets.faceLandmark68Net.loadFromUri(
-'https://cdn.jsdelivr.net/npm/face-api.js/weights'
-);
+faceapi.nets.tinyFaceDetector.loadFromUri(
+MODEL_URL
+),
+
+faceapi.nets.faceLandmark68Net.loadFromUri(
+MODEL_URL
+),
+
+faceapi.nets.faceRecognitionNet.loadFromUri(
+MODEL_URL
+)
+
+]);
 
 }
 
 async function startCamera(){
 
-const video = document.getElementById('video');
+const video =
+document.getElementById('video');
 
-const stream = await navigator.mediaDevices.getUserMedia({
-video:true
+try{
+
+const stream =
+await navigator.mediaDevices.getUserMedia({
+
+video:{
+width:640,
+height:480,
+facingMode:'user'
+},
+
+audio:false
+
 });
 
 video.srcObject = stream;
 
+await video.play();
+
 return new Promise(resolve=>{
+
 video.onloadedmetadata=()=>{
+
 resolve();
+
 };
+
 });
+
+}catch(err){
+
+console.log(err);
+
+alert('เปิดกล้องไม่ได้');
+
+}
 
 }
 
 async function getEmployees(){
 
-const res = await fetch(
+const res =
+await fetch(
 API_URL + '?action=getEmployees'
 );
 
-const data = await res.json();
+const data =
+await res.json();
 
-employeeData = data.data;
+employeeData =
+data.data;
 
 return employeeData;
 
@@ -55,20 +91,28 @@ await loadModels();
 
 await startCamera();
 
-const employees = await getEmployees();
+const employees =
+await getEmployees();
 
-const select = document.getElementById('employeeSelect');
+const select =
+document.getElementById(
+'employeeSelect'
+);
 
 select.innerHTML = '';
 
 employees.forEach(emp=>{
 
-const opt = document.createElement('option');
+const opt =
+document.createElement('option');
 
-opt.value = emp.employeeId;
+opt.value =
+emp.employeeId;
 
 opt.textContent =
-emp.employeeId + ' - ' + emp.name;
+emp.employeeId +
+' - ' +
+emp.name;
 
 select.appendChild(opt);
 
@@ -76,13 +120,21 @@ select.appendChild(opt);
 
 fillEmployee();
 
-select.addEventListener('change',fillEmployee);
+select.addEventListener(
+'change',
+fillEmployee
+);
 
 document
 .getElementById('saveBtn')
-.addEventListener('click',saveFace);
+.addEventListener(
+'click',
+saveFace
+);
 
-document.getElementById('status').innerHTML =
+document.getElementById(
+'status'
+).innerHTML =
 '✅ AI Ready';
 
 }
@@ -90,34 +142,52 @@ document.getElementById('status').innerHTML =
 function fillEmployee(){
 
 const id =
-document.getElementById('employeeSelect').value;
+document.getElementById(
+'employeeSelect'
+).value;
 
 const emp =
-employeeData.find(x=>x.employeeId===id);
+employeeData.find(
+x=>x.employeeId===id
+);
 
 if(!emp) return;
 
-document.getElementById('name').value =
+document.getElementById(
+'name'
+).value =
 emp.name;
 
-document.getElementById('department').value =
+document.getElementById(
+'department'
+).value =
 emp.department;
 
-document.getElementById('team').value =
+document.getElementById(
+'team'
+).value =
 emp.team;
 
-document.getElementById('shift').value =
+document.getElementById(
+'shift'
+).value =
 emp.shiftType;
 
 }
 
 async function saveFace(){
 
-const video = document.getElementById('video');
+const video =
+document.getElementById(
+'video'
+);
 
 const detection =
 await faceapi
-.detectSingleFace(video)
+.detectSingleFace(
+video,
+new faceapi.TinyFaceDetectorOptions()
+)
 .withFaceLandmarks()
 .withFaceDescriptor();
 
@@ -130,12 +200,17 @@ return;
 }
 
 const descriptor =
-Array.from(detection.descriptor);
+Array.from(
+detection.descriptor
+);
 
 const employeeId =
-document.getElementById('employeeSelect').value;
+document.getElementById(
+'employeeSelect'
+).value;
 
-const res = await fetch(API_URL,{
+const res =
+await fetch(API_URL,{
 
 method:'POST',
 
@@ -151,7 +226,8 @@ descriptor
 
 });
 
-const data = await res.json();
+const data =
+await res.json();
 
 alert(data.message);
 
@@ -163,50 +239,76 @@ await loadModels();
 
 await startCamera();
 
-const employees = await getEmployees();
+const employees =
+await getEmployees();
 
 const labeled = [];
 
 for(const emp of employees){
 
-if(!emp.faceDescriptor) continue;
+if(!emp.faceDescriptor)
+continue;
 
 const descriptor =
-JSON.parse(emp.faceDescriptor);
+JSON.parse(
+emp.faceDescriptor
+);
 
 labeled.push(
-new faceapi.LabeledFaceDescriptors(
+
+new faceapi
+.LabeledFaceDescriptors(
+
 emp.employeeId,
+
 [
-new Float32Array(descriptor)
-]
+new Float32Array(
+descriptor
 )
+]
+
+)
+
 );
 
 }
 
 faceMatcher =
-new faceapi.FaceMatcher(labeled,.5);
+new faceapi.FaceMatcher(
+labeled,
+0.5
+);
 
 document
 .getElementById('scanBtn')
-.addEventListener('click',scanFace);
+.addEventListener(
+'click',
+scanFace
+);
 
 }
 
 async function scanFace(){
 
 const resultBox =
-document.getElementById('scanResult');
+document.getElementById(
+'scanResult'
+);
 
-resultBox.innerHTML='Scanning...';
+resultBox.innerHTML =
+'Scanning...';
 
 const video =
-document.getElementById('video');
+document.getElementById(
+'video'
+);
 
 const detection =
 await faceapi
-.detectSingleFace(video)
+.detectSingleFace(
+video,
+new faceapi.TinyFaceDetectorOptions()
+)
 .withFaceLandmarks()
 .withFaceDescriptor();
 
@@ -238,7 +340,8 @@ employeeData.find(
 x=>x.employeeId===best.label
 );
 
-const res = await fetch(API_URL,{
+const res =
+await fetch(API_URL,{
 
 method:'POST',
 
@@ -246,13 +349,15 @@ body:JSON.stringify({
 
 action:'scanAttendance',
 
-employeeId:emp.employeeId
+employeeId:
+emp.employeeId
 
 })
 
 });
 
-const data = await res.json();
+const data =
+await res.json();
 
 resultBox.innerHTML = `
 ✅ ${emp.name}<br>
@@ -263,28 +368,68 @@ ${data.status}
 
 }
 
+function formatDate(dateStr){
+
+const d =
+new Date(dateStr);
+
+return d.toLocaleDateString(
+'th-TH'
+);
+
+}
+
+function formatTime(timeStr){
+
+if(!timeStr)
+return '-';
+
+if(timeStr.includes('T')){
+
+return timeStr
+.split('T')[1]
+.replace('.000Z','');
+
+}
+
+return timeStr;
+
+}
+
 async function loadDashboard(){
 
-const res = await fetch(
+const res =
+await fetch(
 API_URL + '?action=getDashboard'
 );
 
-const data = await res.json();
+const data =
+await res.json();
 
-document.getElementById('empCount').innerHTML =
+document.getElementById(
+'empCount'
+).innerHTML =
 data.summary.employees;
 
-document.getElementById('scanCount').innerHTML =
+document.getElementById(
+'scanCount'
+).innerHTML =
 data.summary.total;
 
-document.getElementById('inCount').innerHTML =
+document.getElementById(
+'inCount'
+).innerHTML =
 data.summary.in;
 
-document.getElementById('outCount').innerHTML =
+document.getElementById(
+'outCount'
+).innerHTML =
 data.summary.out;
 
 const tbody =
-document.getElementById('tableBody');
+document.getElementById(
+'tableBody'
+);
 
 tbody.innerHTML='';
 
@@ -292,22 +437,34 @@ data.logs.forEach(log=>{
 
 tbody.innerHTML += `
 <tr>
-<td>${log.date}</td>
-<td>${log.time}</td>
+
+<td>${formatDate(log.date)}</td>
+
+<td>${formatTime(log.time)}</td>
+
 <td>${log.employeeId}</td>
+
 <td>${log.name}</td>
+
 <td>${log.department}</td>
+
 <td>${log.team}</td>
+
 <td>${log.shift}</td>
+
 <td>${log.scanType}</td>
+
 <td>${log.status}</td>
+
 </tr>
 `;
 
 });
 
 const dept =
-document.getElementById('filterDept');
+document.getElementById(
+'filterDept'
+);
 
 dept.innerHTML =
 '<option value="">All Department</option>';

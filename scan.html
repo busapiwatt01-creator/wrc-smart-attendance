@@ -1,30 +1,42 @@
 <!DOCTYPE html>
 <html lang="th">
-
 <head>
 
 <meta charset="UTF-8">
 
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="viewport"
+content="width=device-width, initial-scale=1.0">
 
-<title>Scan Attendance</title>
+<title>
+Scan Attendance
+</title>
 
-<link rel="stylesheet" href="style.css">
+<link rel="stylesheet"
+href="style.css">
 
-<script defer src="https://cdn.jsdelivr.net/npm/face-api.js"></script>
+<script defer
+src="https://cdn.jsdelivr.net/npm/face-api.js"></script>
 
-<script src="api-config.js"></script>
+<script defer
+src="api-config.js"></script>
+
+<script defer
+src="script.js"></script>
 
 </head>
 
-<body>
+<body
+onload="initScan()">
 
-<div class="page">
+<div class="page-container">
 
-<div class="topbar">
+<div class="top-bar">
 
-<a href="index.html" class="home-btn">
+<a href="index.html"
+class="back-btn">
+
 ← Home
+
 </a>
 
 <h1>
@@ -39,28 +51,32 @@
 id="video"
 autoplay
 muted
-playsinline
-></video>
+playsinline>
+</video>
 
-<button id="scanBtn">
+<canvas
+id="canvas">
+</canvas>
+
+<button
+class="main-btn"
+onclick="scanFace()">
+
 🚀 Scan Face
+
 </button>
 
-<div id="scanResult">
+<div
+id="status"
+class="status-box">
+
 Waiting Scan...
-</div>
 
 </div>
 
 </div>
 
-<script src="script.js"></script>
-
-<script>
-
-initScan();
-
-</script>
+</div>
 
 </body>
 </html>

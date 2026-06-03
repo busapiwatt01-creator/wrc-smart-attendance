@@ -1,137 +1,82 @@
 <!DOCTYPE html>
 <html lang="th">
-
 <head>
 
 <meta charset="UTF-8">
 
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="viewport"
+content="width=device-width, initial-scale=1.0">
 
-<title>Dashboard</title>
+<title>
+Scan Attendance
+</title>
 
-<link rel="stylesheet" href="style.css">
+<link rel="stylesheet"
+href="style.css">
 
-<script src="api-config.js"></script>
+<script defer
+src="https://cdn.jsdelivr.net/npm/face-api.js"></script>
+
+<script defer
+src="api-config.js"></script>
+
+<script defer
+src="script.js"></script>
 
 </head>
 
-<body>
+<body
+onload="initScan()">
 
-<div class="page">
+<div class="page-container">
 
-<div class="topbar">
+<div class="top-bar">
 
-<a href="index.html" class="home-btn">
+<a href="index.html"
+class="back-btn">
+
 ← Home
+
 </a>
 
 <h1>
-📊 Attendance Dashboard
+📷 Scan Attendance
 </h1>
 
 </div>
 
-<div class="stats-grid">
+<div class="camera-card">
 
-<div class="stat-card">
+<video
+id="video"
+autoplay
+muted
+playsinline>
+</video>
 
-<h2 id="empCount">
-0
-</h2>
+<canvas
+id="canvas">
+</canvas>
 
-<p>Employees</p>
+<button
+class="main-btn"
+onclick="scanFace()">
 
-</div>
+🚀 Scan Face
 
-<div class="stat-card">
-
-<h2 id="scanCount">
-0
-</h2>
-
-<p>Total Scan</p>
-
-</div>
-
-<div class="stat-card">
-
-<h2 id="inCount">
-0
-</h2>
-
-<p>IN</p>
-
-</div>
-
-<div class="stat-card">
-
-<h2 id="outCount">
-0
-</h2>
-
-<p>OUT</p>
-
-</div>
-
-</div>
-
-<div class="filter-box">
-
-<input type="date" id="filterDate">
-
-<select id="filterDept">
-
-<option value="">
-All Department
-</option>
-
-</select>
-
-<button onclick="loadDashboard()">
-Refresh
 </button>
 
-</div>
+<div
+id="status"
+class="status-box">
 
-<div class="table-card">
-
-<table>
-
-<thead>
-
-<tr>
-
-<th>Date</th>
-<th>Time</th>
-<th>ID</th>
-<th>Name</th>
-<th>Department</th>
-<th>Team</th>
-<th>Shift</th>
-<th>Type</th>
-<th>Status</th>
-
-</tr>
-
-</thead>
-
-<tbody id="tableBody">
-
-</tbody>
-
-</table>
+Waiting Scan...
 
 </div>
 
 </div>
 
-<script src="script.js"></script>
-
-<script>
-
-loadDashboard();
-
-</script>
+</div>
 
 </body>
 </html>
