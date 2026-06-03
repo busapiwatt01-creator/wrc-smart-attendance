@@ -5,19 +5,13 @@
 
 <meta charset="UTF-8">
 
-<meta
-name="viewport"
-content="width=device-width, initial-scale=1.0"
->
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
 
-<title>
-Dashboard
-</title>
+<title>Dashboard</title>
 
-<link
-rel="stylesheet"
-href="style.css"
->
+<link rel="stylesheet" href="style.css">
+
+<script src="api-config.js"></script>
 
 </head>
 
@@ -25,66 +19,57 @@ href="style.css"
 
 <div class="page">
 
-<a
-href="index.html"
-class="back-btn"
->
+<div class="topbar">
 
+<a href="index.html" class="home-btn">
 ← Home
-
 </a>
 
-<div class="page-title">
+<h1>
 📊 Attendance Dashboard
-</div>
-
-<div class="summary-grid">
-
-<div class="summary-card">
-
-<h3 id="totalEmployee">
-0
-</h3>
-
-<p>
-Employees
-</p>
+</h1>
 
 </div>
 
-<div class="summary-card">
+<div class="stats-grid">
 
-<h3 id="totalScan">
+<div class="stat-card">
+
+<h2 id="empCount">
 0
-</h3>
+</h2>
 
-<p>
-Total Scan
-</p>
+<p>Employees</p>
 
 </div>
 
-<div class="summary-card">
+<div class="stat-card">
 
-<h3 id="todayIn">
+<h2 id="scanCount">
 0
-</h3>
+</h2>
 
-<p>
-IN
-</p>
+<p>Total Scan</p>
 
 </div>
 
-<div class="summary-card">
+<div class="stat-card">
 
-<h3 id="todayOut">
+<h2 id="inCount">
 0
-</h3>
+</h2>
 
-<p>
-OUT
-</p>
+<p>IN</p>
+
+</div>
+
+<div class="stat-card">
+
+<h2 id="outCount">
+0
+</h2>
+
+<p>OUT</p>
 
 </div>
 
@@ -92,12 +77,9 @@ OUT
 
 <div class="filter-box">
 
-<input
-type="date"
-id="filterDate"
->
+<input type="date" id="filterDate">
 
-<select id="filterDepartment">
+<select id="filterDept">
 
 <option value="">
 All Department
@@ -111,7 +93,7 @@ Refresh
 
 </div>
 
-<div class="dashboard-card">
+<div class="table-card">
 
 <table>
 
@@ -125,6 +107,7 @@ Refresh
 <th>Name</th>
 <th>Department</th>
 <th>Team</th>
+<th>Shift</th>
 <th>Type</th>
 <th>Status</th>
 
@@ -142,7 +125,6 @@ Refresh
 
 </div>
 
-<script src="api-config.js"></script>
 <script src="script.js"></script>
 
 <script>

@@ -1,285 +1,325 @@
-let video =
-document.getElementById('video');
+let faceMatcher;
+let employeeData = [];
+
+async function loadModels(){
+
+await faceapi.nets.ssdMobilenetv1.loadFromUri(
+'https://cdn.jsdelivr.net/npm/face-api.js/weights'
+);
+
+await faceapi.nets.faceRecognitionNet.loadFromUri(
+'https://cdn.jsdelivr.net/npm/face-api.js/weights'
+);
+
+await faceapi.nets.faceLandmark68Net.loadFromUri(
+'https://cdn.jsdelivr.net/npm/face-api.js/weights'
+);
+
+}
 
 async function startCamera(){
 
-try{
+const video = document.getElementById('video');
 
-const stream =
-
-await navigator
-.mediaDevices
-.getUserMedia({
+const stream = await navigator.mediaDevices.getUserMedia({
 video:true
 });
 
 video.srcObject = stream;
 
-}catch(err){
-
-alert('ไม่สามารถเปิดกล้องได้');
+return new Promise(resolve=>{
+video.onloadedmetadata=()=>{
+resolve();
+};
+});
 
 }
 
+async function getEmployees(){
+
+const res = await fetch(
+API_URL + '?action=getEmployees'
+);
+
+const data = await res.json();
+
+employeeData = data.data;
+
+return employeeData;
+
 }
 
-async function loadEmployees(){
+async function initRegister(){
 
-const res =
+await loadModels();
 
-await fetch(
-GAS_API_URL +
-'?action=getEmployees'
-);
+await startCamera();
 
-const employees =
-await res.json();
+const employees = await getEmployees();
 
-const select =
+const select = document.getElementById('employeeSelect');
 
-document.getElementById(
-'employeeSelect'
-);
+select.innerHTML = '';
 
 employees.forEach(emp=>{
 
-const option =
-document.createElement(
-'option'
-);
+const opt = document.createElement('option');
 
-option.value =
-JSON.stringify(emp);
+opt.value = emp.employeeId;
 
-option.textContent =
-emp.employeeId +
-' - ' +
-emp.name;
+opt.textContent =
+emp.employeeId + ' - ' + emp.name;
 
-select.appendChild(
-option
-);
+select.appendChild(opt);
 
 });
 
-select.addEventListener(
-'change',
-function(){
+fillEmployee();
 
-const emp =
-JSON.parse(this.value);
+select.addEventListener('change',fillEmployee);
 
-document.getElementById(
-'name'
-).value = emp.name;
+document
+.getElementById('saveBtn')
+.addEventListener('click',saveFace);
 
-document.getElementById(
-'department'
-).value =
-emp.department;
-
-document.getElementById(
-'team'
-).value =
-emp.team;
-
-document.getElementById(
-'shiftType'
-).value =
-emp.shiftType;
+document.getElementById('status').innerHTML =
+'✅ AI Ready';
 
 }
-);
+
+function fillEmployee(){
+
+const id =
+document.getElementById('employeeSelect').value;
+
+const emp =
+employeeData.find(x=>x.employeeId===id);
+
+if(!emp) return;
+
+document.getElementById('name').value =
+emp.name;
+
+document.getElementById('department').value =
+emp.department;
+
+document.getElementById('team').value =
+emp.team;
+
+document.getElementById('shift').value =
+emp.shiftType;
 
 }
 
 async function saveFace(){
 
-const emp =
-JSON.parse(
-document.getElementById(
-'employeeSelect'
-).value
-);
+const video = document.getElementById('video');
+
+const detection =
+await faceapi
+.detectSingleFace(video)
+.withFaceLandmarks()
+.withFaceDescriptor();
+
+if(!detection){
+
+alert('ไม่พบใบหน้า');
+
+return;
+
+}
 
 const descriptor =
-Array.from(
-{length:128},
-()=>Math.random()
-);
+Array.from(detection.descriptor);
 
-await fetch(
-GAS_API_URL,
-{
+const employeeId =
+document.getElementById('employeeSelect').value;
+
+const res = await fetch(API_URL,{
+
 method:'POST',
+
 body:JSON.stringify({
 
 action:'saveFace',
 
-employeeId:
-emp.employeeId,
+employeeId,
 
-descriptor:
 descriptor
 
 })
+
+});
+
+const data = await res.json();
+
+alert(data.message);
+
 }
+
+async function initScan(){
+
+await loadModels();
+
+await startCamera();
+
+const employees = await getEmployees();
+
+const labeled = [];
+
+for(const emp of employees){
+
+if(!emp.faceDescriptor) continue;
+
+const descriptor =
+JSON.parse(emp.faceDescriptor);
+
+labeled.push(
+new faceapi.LabeledFaceDescriptors(
+emp.employeeId,
+[
+new Float32Array(descriptor)
+]
+)
 );
 
-const status =
-document.getElementById(
-'status'
-);
+}
 
-status.className =
-'status-box success';
+faceMatcher =
+new faceapi.FaceMatcher(labeled,.5);
 
-status.innerHTML =
-'บันทึกใบหน้าสำเร็จ';
+document
+.getElementById('scanBtn')
+.addEventListener('click',scanFace);
 
 }
 
 async function scanFace(){
 
-const res =
+const resultBox =
+document.getElementById('scanResult');
 
-await fetch(
-GAS_API_URL +
-'?action=scanFace'
-);
+resultBox.innerHTML='Scanning...';
 
-const result =
-await res.json();
+const video =
+document.getElementById('video');
 
-const status =
-document.getElementById(
-'status'
-);
+const detection =
+await faceapi
+.detectSingleFace(video)
+.withFaceLandmarks()
+.withFaceDescriptor();
 
-if(result.status=='success'){
+if(!detection){
 
-status.className =
-'status-box success';
+resultBox.innerHTML =
+'❌ ไม่พบใบหน้า';
 
-status.innerHTML =
-
-`
-✅ ${result.name}<br>
-${result.employeeId}<br>
-${result.department}<br>
-${result.team}<br>
-${result.scanType}
-`;
-
-}else{
-
-status.className =
-'status-box error';
-
-status.innerHTML =
-'ไม่พบใบหน้า';
+return;
 
 }
+
+const best =
+faceMatcher.findBestMatch(
+detection.descriptor
+);
+
+if(best.label==='unknown'){
+
+resultBox.innerHTML =
+'❌ ไม่พบข้อมูล';
+
+return;
+
+}
+
+const emp =
+employeeData.find(
+x=>x.employeeId===best.label
+);
+
+const res = await fetch(API_URL,{
+
+method:'POST',
+
+body:JSON.stringify({
+
+action:'scanAttendance',
+
+employeeId:emp.employeeId
+
+})
+
+});
+
+const data = await res.json();
+
+resultBox.innerHTML = `
+✅ ${emp.name}<br>
+${emp.department}<br>
+${data.scanType}<br>
+${data.status}
+`;
 
 }
 
 async function loadDashboard(){
 
-const res =
-
-await fetch(
-GAS_API_URL +
-'?action=getLogs'
+const res = await fetch(
+API_URL + '?action=getDashboard'
 );
 
-const logs =
-await res.json();
+const data = await res.json();
+
+document.getElementById('empCount').innerHTML =
+data.summary.employees;
+
+document.getElementById('scanCount').innerHTML =
+data.summary.total;
+
+document.getElementById('inCount').innerHTML =
+data.summary.in;
+
+document.getElementById('outCount').innerHTML =
+data.summary.out;
 
 const tbody =
-document.getElementById(
-'tableBody'
-);
+document.getElementById('tableBody');
 
 tbody.innerHTML='';
 
-let totalScan=0;
-let todayIn=0;
-let todayOut=0;
+data.logs.forEach(log=>{
 
-const departments =
-new Set();
-
-logs.reverse().forEach(log=>{
-
-departments.add(
-log.department
-);
-
-totalScan++;
-
-if(log.scanType=='IN'){
-todayIn++;
-}
-
-if(log.scanType=='OUT'){
-todayOut++;
-}
-
-tbody.innerHTML +=
-
-`
+tbody.innerHTML += `
 <tr>
-
 <td>${log.date}</td>
 <td>${log.time}</td>
 <td>${log.employeeId}</td>
 <td>${log.name}</td>
 <td>${log.department}</td>
 <td>${log.team}</td>
-
-<td class="
-${log.scanType=='IN'
-?
-'status-in'
-:
-'status-out'
-}
-">
-
-${log.scanType}
-
-</td>
-
+<td>${log.shift}</td>
+<td>${log.scanType}</td>
 <td>${log.status}</td>
-
 </tr>
 `;
 
 });
 
-document.getElementById(
-'totalScan'
-).innerHTML =
-totalScan;
+const dept =
+document.getElementById('filterDept');
 
-document.getElementById(
-'todayIn'
-).innerHTML =
-todayIn;
+dept.innerHTML =
+'<option value="">All Department</option>';
 
-document.getElementById(
-'todayOut'
-).innerHTML =
-todayOut;
+data.departments.forEach(d=>{
 
-document.getElementById(
-'totalEmployee'
-).innerHTML =
+dept.innerHTML += `
+<option value="${d}">
+${d}
+</option>
+`;
 
-new Set(
-logs.map(
-x=>x.employeeId
-)
-).size;
+});
 
 }

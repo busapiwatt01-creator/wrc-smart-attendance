@@ -5,19 +5,15 @@
 
 <meta charset="UTF-8">
 
-<meta
-name="viewport"
-content="width=device-width, initial-scale=1.0"
->
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
 
-<title>
-Scan Attendance
-</title>
+<title>Scan Attendance</title>
 
-<link
-rel="stylesheet"
-href="style.css"
->
+<link rel="stylesheet" href="style.css">
+
+<script defer src="https://cdn.jsdelivr.net/npm/face-api.js"></script>
+
+<script src="api-config.js"></script>
 
 </head>
 
@@ -25,53 +21,44 @@ href="style.css"
 
 <div class="page">
 
-<a
-href="index.html"
-class="back-btn"
->
+<div class="topbar">
 
+<a href="index.html" class="home-btn">
 ← Home
-
 </a>
 
-<div class="form-card">
-
-<div class="page-title">
+<h1>
 📷 Scan Attendance
+</h1>
+
 </div>
+
+<div class="camera-card">
 
 <video
 id="video"
 autoplay
-playsinline
 muted
+playsinline
 ></video>
 
-<button onclick="scanFace()">
-
+<button id="scanBtn">
 🚀 Scan Face
-
 </button>
 
-<div
-id="status"
-class="status-box"
->
-
+<div id="scanResult">
 Waiting Scan...
-
 </div>
 
 </div>
 
 </div>
 
-<script src="api-config.js"></script>
 <script src="script.js"></script>
 
 <script>
 
-startCamera();
+initScan();
 
 </script>
 

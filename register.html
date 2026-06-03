@@ -5,19 +5,15 @@
 
 <meta charset="UTF-8">
 
-<meta
-name="viewport"
-content="width=device-width, initial-scale=1.0"
->
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
 
-<title>
-Register Face
-</title>
+<title>Register Face</title>
 
-<link
-rel="stylesheet"
-href="style.css"
->
+<link rel="stylesheet" href="style.css">
+
+<script defer src="https://cdn.jsdelivr.net/npm/face-api.js"></script>
+
+<script src="api-config.js"></script>
 
 </head>
 
@@ -25,90 +21,54 @@ href="style.css"
 
 <div class="page">
 
-<a
-href="index.html"
-class="back-btn"
->
+<div class="topbar">
 
+<a href="index.html" class="home-btn">
 ← Home
-
 </a>
 
-<div class="form-card">
-
-<div class="page-title">
+<h1>
 👤 Register Face
+</h1>
+
 </div>
+
+<div class="camera-card">
 
 <video
 id="video"
 autoplay
-playsinline
 muted
+playsinline
 ></video>
 
-<select id="employeeSelect">
+<select id="employeeSelect"></select>
 
-<option value="">
-เลือกพนักงาน
-</option>
+<input id="name" readonly>
 
-</select>
+<input id="department" readonly>
 
-<input
-type="text"
-id="name"
-placeholder="Name"
-readonly
->
+<input id="team" readonly>
 
-<input
-type="text"
-id="department"
-placeholder="Department"
-readonly
->
+<input id="shift" readonly>
 
-<input
-type="text"
-id="team"
-placeholder="Team"
-readonly
->
-
-<input
-type="text"
-id="shiftType"
-placeholder="ShiftType"
-readonly
->
-
-<button onclick="saveFace()">
-
+<button id="saveBtn">
 💾 Save Face
-
 </button>
 
-<div
-id="status"
-class="status-box"
->
-
-AI Ready
-
+<div id="status">
+Loading...
 </div>
 
 </div>
 
 </div>
 
-<script src="api-config.js"></script>
 <script src="script.js"></script>
 
 <script>
 
-loadEmployees();
-startCamera();
+initRegister();
 
 </script>
 
