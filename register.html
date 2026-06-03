@@ -7,83 +7,105 @@
 
 <meta
 name="viewport"
-content="width=device-width,initial-scale=1.0">
+content="width=device-width, initial-scale=1.0"
+>
 
 <title>
 Register Face
 </title>
 
 <link
-href="https://fonts.googleapis.com/css2?family=Sarabun:wght@300;400;700&display=swap"
-rel="stylesheet">
+rel="stylesheet"
+href="style.css"
+>
 
 <link
+href="https://fonts.googleapis.com/css2?family=Kanit:wght@300;400;500;600;700&display=swap"
 rel="stylesheet"
-href="style.css">
+>
 
-<script src="api-config.js"></script>
-
-<script defer
-src="https://cdn.jsdelivr.net/npm/face-api.js@0.22.2/dist/face-api.min.js">
-</script>
+<script
+defer
+src="https://cdn.jsdelivr.net/npm/face-api.js"
+></script>
 
 </head>
 
 <body>
 
-<div class="container">
+<div class="page">
+
+<div class="page-header">
+
+<a
+href="index.html"
+class="back-btn"
+>
+
+← Home
+
+</a>
+
+<h1>
+👤 Register Face
+</h1>
+
+</div>
 
 <div class="card">
-
-<div class="title">
-👤 Register Face
-</div>
-
-<div class="subtitle">
-ลงทะเบียนใบหน้าพนักงาน
-</div>
 
 <video
 id="video"
 autoplay
 muted
-playsinline>
-</video>
+playsinline
+></video>
 
-<input
-type="text"
-id="employeeId"
-placeholder="Employee ID">
+<select id="employeeSelect">
+
+<option value="">
+เลือกพนักงาน
+</option>
+
+</select>
 
 <input
 type="text"
 id="name"
-placeholder="Name">
+placeholder="Name"
+readonly
+>
 
 <input
 type="text"
 id="department"
-placeholder="Department">
+placeholder="Department"
+readonly
+>
 
 <input
 type="text"
 id="team"
-placeholder="Team">
+placeholder="Team"
+readonly
+>
 
 <input
 type="text"
 id="shiftType"
-placeholder="Shift Type">
+placeholder="Shift Type"
+readonly
+>
 
 <button onclick="saveFace()">
-📸 Save Face
+
+💾 Save Face
+
 </button>
 
-<div
-class="status"
-id="status">
+<div id="status">
 
-⏳ Loading AI...
+✅ AI Ready
 
 </div>
 
@@ -91,155 +113,14 @@ id="status">
 
 </div>
 
+<script src="api-config.js"></script>
 <script src="script.js"></script>
 
 <script>
 
-const MODEL =
-MODEL_URL;
+loadEmployees();
 
-async function loadAI(){
-
-await Promise.all([
-
-faceapi.nets.tinyFaceDetector
-.loadFromUri(MODEL),
-
-faceapi.nets.faceLandmark68Net
-.loadFromUri(MODEL),
-
-faceapi.nets.faceRecognitionNet
-.loadFromUri(MODEL)
-
-]);
-
-document.getElementById(
-'status'
-).innerHTML =
-'✅ AI Ready';
-
-}
-
-/* ======================= */
-
-async function saveFace(){
-
-const employeeId =
-document.getElementById(
-'employeeId'
-);
-
-const name =
-document.getElementById(
-'name'
-);
-
-if(
-!employeeId.value ||
-!name.value
-){
-
-alert(
-'กรอกข้อมูลให้ครบ'
-);
-
-return;
-
-}
-
-document.getElementById(
-'status'
-).innerHTML =
-'⏳ Detecting Face...';
-
-const detection =
-
-await faceapi
-.detectSingleFace(
-
-video,
-
-new faceapi
-.TinyFaceDetectorOptions()
-
-)
-.withFaceLandmarks()
-.withFaceDescriptor();
-
-if(!detection){
-
-document.getElementById(
-'status'
-).innerHTML =
-
-'<span class="error">❌ ไม่พบใบหน้า</span>';
-
-return;
-
-}
-
-const descriptor =
-
-Array.from(
-detection.descriptor
-);
-
-await fetch(
-
-GAS_API_URL,
-
-{
-
-method:'POST',
-
-body:JSON.stringify({
-
-action:'register',
-
-employeeId:
-employeeId.value,
-
-name:
-name.value,
-
-department:
-document.getElementById(
-'department'
-).value,
-
-team:
-document.getElementById(
-'team'
-).value,
-
-shiftType:
-document.getElementById(
-'shiftType'
-).value,
-
-descriptor:descriptor
-
-})
-
-});
-
-document.getElementById(
-'status'
-).innerHTML =
-
-'<span class="success">✅ Register Success</span>';
-
-}
-
-/* ======================= */
-
-(async()=>{
-
-await startCamera();
-
-await loadAI();
-
-})();
+startCamera();
 
 </script>
 

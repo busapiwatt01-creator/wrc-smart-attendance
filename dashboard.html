@@ -1,7 +1,14 @@
 <!DOCTYPE html>
-<html>
+<html lang="th">
 
 <head>
+
+<meta charset="UTF-8">
+
+<meta
+name="viewport"
+content="width=device-width, initial-scale=1.0"
+>
 
 <title>
 Dashboard
@@ -9,25 +16,40 @@ Dashboard
 
 <link
 rel="stylesheet"
-href="css/style.css"
-/>
+href="style.css"
+>
+
+<link
+href="https://fonts.googleapis.com/css2?family=Kanit:wght@300;400;500;600;700&display=swap"
+rel="stylesheet"
+>
 
 </head>
 
 <body>
 
-<div class="container">
+<div class="page">
+
+<div class="page-header">
+
+<a
+href="index.html"
+class="back-btn"
+>
+
+← Home
+
+</a>
 
 <h1>
-📊 Dashboard
+📊 Attendance Dashboard
 </h1>
 
-<div class="card">
+</div>
 
-<table
-width="100%"
-id="table"
->
+<div class="dashboard-card">
+
+<table>
 
 <thead>
 
@@ -37,13 +59,15 @@ id="table"
 <th>Time</th>
 <th>ID</th>
 <th>Name</th>
+<th>Department</th>
+<th>Team</th>
 <th>Status</th>
 
 </tr>
 
 </thead>
 
-<tbody>
+<tbody id="tableBody">
 
 </tbody>
 
@@ -53,13 +77,14 @@ id="table"
 
 </div>
 
-<script
-src="js/api-config.js"
-></script>
+<script src="api-config.js"></script>
+<script src="script.js"></script>
 
-<script
-src="js/dashboard.js"
-></script>
+<script>
+
+loadDashboard();
+
+</script>
 
 </body>
 </html>

@@ -7,49 +7,89 @@
 
 <meta
 name="viewport"
-content="width=device-width,initial-scale=1.0">
+content="width=device-width, initial-scale=1.0"
+>
 
 <title>
 WRC SMART ATTENDANCE
 </title>
 
 <link
-href="https://fonts.googleapis.com/css2?family=Sarabun:wght@300;400;700&display=swap"
-rel="stylesheet">
+rel="stylesheet"
+href="style.css"
+>
 
 <link
+href="https://fonts.googleapis.com/css2?family=Kanit:wght@300;400;500;600;700&display=swap"
 rel="stylesheet"
-href="style.css">
+>
 
 </head>
 
 <body>
 
+<div class="bg"></div>
+
 <div class="container">
 
-<div class="card">
+<div class="header">
 
-<div class="title">
-🏢 WRC SMART ATTENDANCE
+<div class="logo">
+
+<div class="logo-icon">
+🏢
 </div>
 
-<div class="subtitle">
-ระบบสแกนใบหน้าเข้าออกงาน
+<div>
+
+<h1>
+WRC SMART ATTENDANCE
+</h1>
+
+<p>
+Smart Face Recognition Attendance
+</p>
+
+</div>
+
+</div>
+
+<div
+class="clock"
+id="clock"
+>
+</div>
+
+</div>
+
+<div class="hero">
+
+<h2>
+Next Generation
+Attendance System
+</h2>
+
+<p>
+ระบบสแกนใบหน้าเข้าออกงานอัจฉริยะ
+สำหรับองค์กรยุคใหม่
+</p>
+
 </div>
 
 <div class="menu-grid">
 
 <a
 href="register.html"
-class="menu-card">
+class="menu-card"
+>
 
-<div class="icon">
+<div class="menu-icon">
 👤
 </div>
 
-<h2>
+<h3>
 Register Face
-</h2>
+</h3>
 
 <p>
 ลงทะเบียนพนักงาน
@@ -59,15 +99,16 @@ Register Face
 
 <a
 href="scan.html"
-class="menu-card">
+class="menu-card"
+>
 
-<div class="icon">
-📷
+<div class="menu-icon">
+📸
 </div>
 
-<h2>
+<h3>
 Scan Attendance
-</h2>
+</h3>
 
 <p>
 สแกนเข้างาน
@@ -77,15 +118,16 @@ Scan Attendance
 
 <a
 href="dashboard.html"
-class="menu-card">
+class="menu-card"
+>
 
-<div class="icon">
+<div class="menu-icon">
 📊
 </div>
 
-<h2>
+<h3>
 Dashboard
-</h2>
+</h3>
 
 <p>
 รายงาน Attendance
@@ -97,7 +139,8 @@ Dashboard
 
 </div>
 
-</div>
+<script src="api-config.js"></script>
+<script src="script.js"></script>
 
 </body>
 </html>
